@@ -8,7 +8,7 @@ The ESP32 shows the currently selected room (`SALA`), current course, professor,
 ---
 
 ## Project Overview
-
+![Project image](https://i.imgur.com/zIfTP7W.png)
 ### Main Features
 
 - ESP32-WROOM-32D firmware built with **PlatformIO** and the **Arduino framework**
@@ -44,19 +44,20 @@ The ESP32 shows the currently selected room (`SALA`), current course, professor,
 
 ## Datasheets / References
 
-Add the exact links for your purchased modules here, because many inexpensive modules use slightly different pin labels.
 
-- ESP32-WROOM-32D datasheet: `TODO: add Espressif datasheet link`
-- ILI9341 TFT controller datasheet: `TODO: add display/controller datasheet link`
-- BMP280 datasheet: `TODO: add Bosch BMP280 datasheet link`
-- HC-SR501 PIR module datasheet/reference: `TODO: add module datasheet link`
-- 3x4 matrix keypad reference: `TODO: add keypad pinout/source link`
+
+* [ESP32-WROOM-32D datasheet](https://documentation.espressif.com/esp32-wroom-32d_esp32-wroom-32u_datasheet_en.pdf)
+* [ILI9341 TFT controller datasheet](https://cdn-shop.adafruit.com/datasheets/ILI9341.pdf)
+* [BMP280 datasheet](https://cdn-shop.adafruit.com/datasheets/BST-BMP280-DS001-11.pdf)
+* [HC-SR501 PIR sensor datasheet](https://www.mpja.com/download/31227sc.pdf)
+* [3x4 matrix keypad reference](https://arduinogetstarted.com/tutorials/arduino-keypad#content_about_keypad)
+
 
 ---
 
 ## GPIO Connections
 
-### ESP32 Pin Usage Summary
+### ESP32 Pin Usage
 
 | ESP32 GPIO | Used for |
 |---:|---|
@@ -95,7 +96,7 @@ Add the exact links for your purchased modules here, because many inexpensive mo
 | LED / BL | 3V3 |
 | SDO / MISO | Not connected |
 
-Touchscreen pins, if present, are not used:
+Touchscreen pins are present, but the Display does not have Touchscreen capabilities:
 
 ```text
 T_CLK
@@ -116,14 +117,6 @@ T_IRQ
 | CSB | 3V3 |
 | SDO | 3V3 |
 
-The BMP280 address is currently:
-
-```text
-0x77
-```
-
-because `SDO` is connected to `3V3`.
-
 ### HC-SR501 PIR Motion Sensor
 
 | PIR pin | ESP32 pin |
@@ -132,7 +125,7 @@ because `SDO` is connected to `3V3`.
 | GND | GND |
 | OUT | GPIO 27 |
 
-The firmware counts a motion event on the rising edge:
+The software counts a motion event on the rising edge:
 
 ```text
 LOW -> HIGH = +1 motion event
@@ -161,17 +154,6 @@ Current wiring:
 | C2 | GPIO 26 |
 | C3 | GPIO 4 |
 
-The keypad does not require VCC or GND.
-
----
-
-## Power Notes
-
-- Power the ESP32 via USB.
-- The TFT backlight and WiFi can draw noticeable current.
-- Use a stable USB cable and power source.
-- If the ESP32 resets randomly or shows brownout warnings, use a better USB cable or external 5V supply.
-- Keep all module grounds connected together.
 
 ---
 
@@ -222,7 +204,7 @@ tft.setRotation(3);
 
 ### WiFi Credentials
 
-The current development firmware contains a local WiFi SSID and password. Before publishing, replace private credentials with placeholders or move them to a local untracked file.
+The current development firmware contains a local WiFi SSID and password. Make sure to change the WiFi network to your preffered 2.4GHz one.
 
 Recommended pattern:
 
@@ -273,10 +255,10 @@ Example response:
 {
   "found": true,
   "server_now": "2026-05-27 18:30",
-  "sala": "EC 002",
-  "curs": "Securitatea Sistemelor",
+  "sala": "EG 205",
+  "curs": "Internet of Things",
   "curs_scurt": "SS",
-  "profesor": "E. SLUANSCHI",
+  "profesor": "PROF NAME",
   "ora": "18:00 - 20:00",
   "zi": "LUNI"
 }
@@ -359,12 +341,6 @@ sudo ufw allow 5000/tcp
 
 AI is used on the dashboard/server side, not inside the ESP32 firmware.
 
-### Why Server-Side AI?
-
-Do not put an OpenAI API key into ESP32 firmware. The firmware can be extracted from the board, which would expose the key.
-
-Good AI uses in this project:
-
 - Normalize long course names into short acronyms
 - Clean professor names
 - Review parsed timetable rows from messy Excel files
@@ -407,8 +383,6 @@ python server.py
 ```
 
 Or use a local `.env` file and add it to `.gitignore`.
-
-Never commit secrets to GitHub.
 
 ---
 
@@ -569,6 +543,8 @@ s
 ```
 
 in Serial Monitor to scan again.
+
+Serial Monitor also returns the .JSON file retrieved from the Dashboard.
 
 ---
 
