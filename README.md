@@ -1,4 +1,4 @@
-[README_smart_classroom_display.md](https://github.com/user-attachments/files/28323458/README_smart_classroom_display.md)
+
 # Smart Classroom ESP32 Display
 
 A WiFi-enabled ESP32 classroom information display with a TFT screen, timetable dashboard API, room selection keypad, PIR activity counter, indoor/outdoor temperature, and a weather information page.
@@ -154,6 +154,8 @@ Current wiring:
 | C2 | GPIO 26 |
 | C3 | GPIO 4 |
 
+## KiCad Schematic
+![KiCad schematic](https://i.imgur.com/8VsSfst.png)
 
 ---
 
@@ -228,6 +230,7 @@ secrets.h
 ---
 
 ## Dashboard/API Server
+![Dashboard](https://i.imgur.com/NQH9Ft4.png)
 
 The ESP32 does not parse Excel directly. Instead:
 
@@ -282,6 +285,7 @@ If nothing is scheduled:
 ---
 
 ## Starting the Server on Linux
+
 
 Assuming the dashboard folder is inside `~/Downloads`:
 
@@ -389,7 +393,7 @@ Or use a local `.env` file and add it to `.gitignore`.
 ## How to Use the ESP32 Display
 
 ### Main Screen
-
+![Main Screen](https://i.imgur.com/uUHDuDz.png)
 The main screen shows:
 
 - `SALA`
@@ -404,7 +408,7 @@ The main screen shows:
 - Footer text: `Nitu Victor-Emanuil - ACS`
 
 ### Change Room Using Keypad
-
+![Select room](https://i.imgur.com/9ZKE0It.png)
 Press:
 
 ```text
@@ -422,7 +426,7 @@ Then select prefix:
 ```
 
 Then enter the room number and confirm with:
-
+![Room number](https://i.imgur.com/FU57LAH.png)
 ```text
 #
 ```
@@ -450,7 +454,7 @@ From the main screen, press:
 ```
 
 The weather page shows:
-
+![Weather](https://i.imgur.com/u4ZBjHw.png)
 - Current Bucharest temperature
 - Humidity from weather API
 - Wind speed
@@ -473,7 +477,7 @@ The BMP280 measured higher than expected, so the firmware applies an offset:
 #define TEMP_OFFSET -5.0
 ```
 
-Adjust after comparing with a known accurate thermometer.
+Adjust after comparing with a known accurate thermometer. This is not ideal, since the error is not linear after consulting the documentation.
 
 ---
 
@@ -546,6 +550,8 @@ in Serial Monitor to scan again.
 
 Serial Monitor also returns the .JSON file retrieved from the Dashboard.
 
+
+![Example Serial Monitor](https://i.imgur.com/5Pa1Tsq.png)
 ---
 
 ## Troubleshooting
@@ -678,7 +684,7 @@ data/*.tmp
 
 ---
 
-## Future Improvements
+## Optional Improvements
 
 - Replace BMP280 with BME280 or SHT31 for real indoor humidity
 - Add OTA firmware updates
@@ -696,11 +702,7 @@ data/*.tmp
 ---
 
 ## License
-
-Choose a license before publishing. Suggested options:
-
 - MIT License for open-source code
-- Private/internal repository if this is for school infrastructure
 
 ---
 
