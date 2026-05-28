@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Smart Classroom Controller</title>
+  <style>
+    :root { --bg:#0f172a; --card:#111827; --muted:#94a3b8; --accent:#38bdf8; --good:#22c55e; --line:#334155; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, sans-serif; background:var(--bg); color:#e5e7eb; }
+    header { padding:22px 28px; border-bottom:1px solid var(--line); background:#020617; }
+    h1 { margin:0 0 4px; font-size:24px; } p { color:var(--muted); }
+    main { padding:22px; display:grid; gap:18px; max-width:1200px; margin:auto; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap:18px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; box-shadow:0 10px 28px rgba(0,0,0,.25); }
+    label { display:block; color:#cbd5e1; font-size:13px; margin:10px 0 4px; }
+    input, select, button { width:100%; box-sizing:border-box; padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:#020617; color:#e5e7eb; }
+    button { background:#0ea5e9; border:0; color:white; font-weight:700; cursor:pointer; margin-top:12px; }
+    button.secondary { background:#334155; }
+    .pill { display:inline-block; padding:4px 9px; border-radius:999px; background:#1e293b; color:#cbd5e1; font-size:12px; }
+    .ai { color: var(--good); font-weight:700; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th, td { border-bottom:1px solid var(--line); padding:8px 6px; text-align:left; vertical-align:top; }
+    th { color:#cbd5e1; position:sticky; top:0; background:#111827; }
+    .table-wrap { max-height:520px; overflow:auto; }
+    code { color:#93c5fd; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Smart Classroom Controller</h1>
+    <p>Upload Excel timetables, edit normalized rows, expose JSON for ESP32, and optionally run AI cleanup.</p>
+  </header>
+  <main>
+    <div class="grid">
+      <section class="card">
+        <h2>1. Upload timetable</h2>
+        <form method="post" action="/upload" enctype="multipart/form-data">
+          <label>.xls or .xlsx</label>
+          <input type="file" name="file" accept=".xls,.xlsx" required>
+          <button>Parse timetable</button>
+        </form>
+        <p><span class="pill">{{ entries|length }} entries parsed</span></p>
+      </section>
+
+      <section class="card">
+        <h2>2. Room controller</h2>
+        <form method="post" action="/select-room">
+          <label>Selected room for ESP32 default endpoint</label>
+          <select name="selected_room">
+            {% for room in rooms %}<option value="{{ room }}" {% if room == cfg.selected_room %}selected{% endif %}>{{ room }}</option>{% endfor %}
+          </select>
+          <button>Set selected room</button>
+        </form>
+        <p>ESP32 can call <code>/api/current?sala=EC002</code> or just <code>/api/current</code> for the selected room.</p>
+      </section>
+
+      <section class="card">
+        <h2>3. AI cleanup</h2>
+        <p>Status: {% if ai_enabled %}<span class="ai">enabled</span>{% else %}<span class="pill">disabled until OPENAI_API_KEY is set</span>{% endif %}</p>
+        <form method="post" action="/ai-cleanup" onsubmit="event.preventDefault(); fetch('/ai-cleanup',{method:'POST'}).then(r=>r.json()).then(j=>alert(j.message)).then(()=>location.reload())">
+          <button class="secondary">Run AI normalization review</button>
+        </form>
+        <p>AI is used as a reviewer/normalizer, not as the critical runtime parser. That makes the demo safer and still counts as AI integration.</p>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>Manual entry</h2>
+      <form method="post" action="/manual" class="grid">
+        <div><label>Day</label><select name="day_index"><option value="0">LUNI</option><option value="1">MARȚI</option><option value="2">MIERCURI</option><option value="3">JOI</option><option value="4">VINERI</option></select></div>
+        <div><label>Start</label><input name="start" value="18:00"></div>
+        <div><label>End</label><input name="end" value="20:00"></div>
+        <div><label>Room</label><input name="room" value="EC 002"></div>
+        <div><label>Course</label><input name="course" value="N/A"></div>
+        <div><label>Professor</label><input name="professor" value="N/A"></div>
+        <div><label>Type</label><input name="activity_type" value="curs"></div>
+        <div><label>Group</label><input name="group" value="all"></div>
+        <div><label>&nbsp;</label><button>Add row</button></div>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Parsed schedule rows</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Day</th><th>Time</th><th>Room</th><th>Course</th><th>Professor</th><th>Type</th><th>Group</th><th>Source</th></tr></thead>
+          <tbody>
+          {% for e in entries %}
+            <tr>
+              <td>{{ e.day }}</td><td>{{ e.start }}–{{ e.end }}</td><td>{{ e.room }}</td><td>{{ e.course }}</td><td>{{ e.professor }}</td><td>{{ e.activity_type }}</td><td>{{ e.group }}</td><td>{{ e.source_text }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
